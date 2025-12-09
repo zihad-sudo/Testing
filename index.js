@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { CONFIG } from "./config.js";
 
 const likesFile = "lastLikes.json";
-const MAX_FETCH = 20; // fetch only last 20 likes
+const MAX_FETCH = 20;
 
 async function getLikedTweets() {
   const url = `https://api.twitterapi.io/user/likes?username=${CONFIG.TWITTER_USERNAME}&limit=${MAX_FETCH}`;
@@ -41,7 +41,7 @@ async function main() {
 
   const newLikes = currentLikes.filter(t => !prevLikedIds.includes(t.id));
 
-  for (const tweet of newLikes.reverse()) { // reverse: oldest-first for nicer order
+  for (const tweet of newLikes.reverse()) {
     const msg = `❤️ NEW LIKE\n\nUser: ${tweet.author?.username || "unknown"}\n\n${tweet.text || ""}\n\n🔗 https://twitter.com/${tweet.author?.username || "user"}/status/${tweet.id}`;
     await sendToTelegram(msg);
   }
@@ -49,7 +49,4 @@ async function main() {
   saveLastLikes(currentLikes.map(t => t.id));
 }
 
-main().catch(err => {
-  console.error("ERROR:", err);
-  process.exit(1);
-});
+main().catch(err => console.error("ERROR:", err));
